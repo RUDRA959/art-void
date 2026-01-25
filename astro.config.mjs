@@ -8,6 +8,7 @@ import tailwind from '@astrojs/tailwind'
 export default defineConfig({
     site: 'https://arsaev.github.io/art-void',
     integrations: [mdx(), sitemap(), tailwind()],
+    output: 'hybrid',
     markdown: {
         shikiConfig: {
           themes: {
