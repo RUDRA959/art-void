@@ -8,8 +8,6 @@ const { artItems } = Astro.props;
       <div class="mt-2">
         <h2 class="text-xl font-semibold">{art.data.name}</h2>
         <p class="text-sm text-gray-500">{art.data.medium} • {art.data.year}/{art.data.month}</p>
-        <p class="text-md font-semibold">{art.data.status}</p>
- 
       </div>
     </div>
   ))}
@@ -27,7 +25,6 @@ const { artItems } = Astro.props;
       <p><strong>Dimensions:</strong> <span id="softbox-dimensions"></span></p>
       <p><strong>Date:</strong> <span id="softbox-date"></span></p>
       <p><strong>Author:</strong> <span id="softbox-author"></span></p>
-      <p id="softbox-status" class="font-semibold"></p>
       <p class="mt-4" id="softbox-text"></p>
     </div>
   </div>
@@ -45,7 +42,6 @@ const { artItems } = Astro.props;
     const date = document.getElementById('softbox-date');
     const author = document.getElementById('softbox-author');
     const text = document.getElementById('softbox-text');
-    const status = document.getElementById('softbox-status');
 
     images.forEach(image => {
       image.onclick = () => {
@@ -58,15 +54,6 @@ const { artItems } = Astro.props;
         date.textContent = `${data.year}/${data.month}`;
         author.textContent = data.author;
         text.textContent = data.text;
-        if (status) {
-          if (data.status) {
-            status.textContent = data.status;
-            status.style.display = '';
-          } else {
-            status.textContent = '';
-            status.style.display = 'none';
-          }
-        }
         softbox.classList.remove('hidden');
       };
     });
