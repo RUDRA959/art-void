@@ -3,8 +3,10 @@ const { artItems } = Astro.props;
 ---
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="art-gallery">
   {artItems.map((art: any) => (
-    <div class="relative group">
-      <img src={art.data.heroImage} alt={art.data.name} class="w-full h-auto object-contain rounded shadow-lg cursor-pointer art-image" loading="lazy" data-art={JSON.stringify(art.data)} />
+    <div class="relative group flex flex-col">
+      <div class="w-full aspect-square overflow-hidden rounded shadow-lg">
+        <img src={art.data.heroImage} alt={art.data.name} class="w-full h-full object-contain cursor-pointer art-image" loading="lazy" data-art={JSON.stringify(art.data)} />
+      </div>
       <div class="mt-2">
         <h2 class="text-xl font-semibold">{art.data.name}</h2>
         <p class="text-sm text-gray-500">{art.data.medium} • {art.data.year}/{art.data.month}</p>

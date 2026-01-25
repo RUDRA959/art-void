@@ -6,36 +6,51 @@ import { getCollection } from 'astro:content';
 import ArtGallery from '../../components/ArtGallery.astro';
 import { fetchArtworks, urlFor } from '../../lib/sanity';
 
-// Make this route dynamic instead of static so it works with dynamically added Sanity artworks
-export const prerender = false;
-
 function slugify(str: string): string {
   return str ? str.toLowerCase().replace(/\s+/g, '-') : '';
 }
 
-const artItems = await getCollection('art');
-const sanityArtworks = await fetchArtworks();
-
-// Transform Sanity artworks to match the structure
-const transformedSanityArtworks = sanityArtworks.map((art: any) => ({
-  data: {
-    name: art.title,
-    heroImage: art.image ? urlFor(art.image).url() : '',
-    medium: art.medium || 'Mixed Media',
-    year: art.year || new Date().getFullYear(),
-    month: art.month || new Date().getMonth() + 1,
-    dimensions: art.dimensions || '',
-    text: art.description || ''
+export async function getStaticPaths() {
+  function slugify(str: string): string {
+    return str ? str.toLowerCase().replace(/\s+/g, '-') : '';
   }
-}));
 
-// Merge all artworks
-const allArtworks = [...artItems, ...transformedSanityArtworks];
+  const artItems = await getCollection('art');
+  const sanityArtworks = await fetchArtworks();
 
-const mediums = Array.from(new Set(allArtworks.map(a => a.data.medium).filter(Boolean)));
-mediums.unshift('All');
+  // Transform Sanity artworks to match the structure
+  const transformedSanityArtworks = sanityArtworks.map((art: any) => ({
+    data: {
+      name: art.title,
+      heroImage: art.image ? urlFor(art.image).url() : '',
+      medium: art.medium || 'Mixed Media',
+      year: art.year || new Date().getFullYear(),
+      month: art.month || new Date().getMonth() + 1,
+      dimensions: art.dimensions || '',
+      text: art.description || ''
+    }
+  }));
 
+  // Merge all artworks
+  const allArtworks = [...artItems, ...transformedSanityArtworks];
+
+  const mediums = Array.from(new Set(allArtworks.map(a => a.data.medium).filter(Boolean)));
+  mediums.unshift('All');
+
+  return mediums.map(m => ({
+    params: { medium: slugify(m) },
+    props: { allArtworks, mediums }
+  }));
+}
+
+interface Props {
+  allArtworks: any[];
+  mediums: string[];
+}
+
+const { allArtworks, mediums } = Astro.props;
 const { medium } = Astro.params;
+
 const selectedMedium = allArtworks.find(a => slugify(a.data.medium) === medium)?.data.medium || 'All';
 
 const filteredArt = selectedMedium === 'All'
@@ -45,7 +60,7 @@ const filteredArt = selectedMedium === 'All'
       slugify(a.data.medium) === medium
     );
 
-filteredArt.sort((a, b) => {
+filteredArt.sort((a: any, b: any) => {
   if (a.data.year !== b.data.year) return b.data.year - a.data.year;
   return b.data.month - a.data.month;
 });
