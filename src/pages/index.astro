@@ -6,6 +6,9 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from 'astro:content';
 import ArtGallery from '../components/ArtGallery.astro';
 import { fetchArtworks, urlFor } from '../lib/sanity';
+
+export const prerender = false;
+
 const artItems = await getCollection('art');
 const sanityArtworks = await fetchArtworks();
 
