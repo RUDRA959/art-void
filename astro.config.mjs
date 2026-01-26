@@ -9,7 +9,7 @@ import tailwind from '@astrojs/tailwind'
 export default defineConfig({
     site: 'https://placeholder.netlify.app',
     integrations: [mdx(), sitemap(), tailwind()],
-    output: 'static',
+    output: 'hybrid',
     adapter: netlify(),
     markdown: {
         shikiConfig: {
