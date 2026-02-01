@@ -18,8 +18,10 @@ export async function fetchBlogs() {
     "slug": _id,
     body
   }`;
+  // Use a non-cached client for fresh data
+  const freshSanity = sanity.withConfig({ useCdn: false });
   try {
-    const blogs = await sanity.fetch(query);
+    const blogs = await freshSanity.fetch(query);
     return blogs || [];
   } catch (error) {
     console.error('Error fetching blogs:', error);
