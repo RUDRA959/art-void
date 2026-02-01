@@ -1,0 +1,58 @@
+---
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import BaseHead from "../../components/BaseHead.astro";
+
+import { fetchBlogBySlug, urlFor } from "../../lib/sanity";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const blog = await fetchBlogBySlug(slug);
+---
+<html lang="en">
+  <head>
+    <BaseHead title={blog?.title || "Blog Post"} description={blog?.title || "Blog post by the artist."} />
+  </head>
+  <body class="w-full max-w-screen-md mx-auto my-4 dark:bg-neutral-800 dark:text-neutral-300 transition-colors duration-300">
+    <Header />
+    <main class="flex flex-col gap-8 px-4 md:px-0">
+      {blog ? (
+        <article class="mb-8 bg-white dark:bg-neutral-900 rounded-xl shadow-lg overflow-hidden border border-neutral-200 dark:border-neutral-800">
+          <div class="p-6 md:p-10">
+            <div class="flex items-center gap-4 mb-4">
+              <h1 class="text-3xl font-bold flex-1">{blog.title}</h1>
+              <span class="text-sm text-gray-500 dark:text-neutral-400 whitespace-nowrap">{blog.month}/{blog.year}</span>
+            </div>
+            <img src={urlFor(blog.image).url()} alt={blog.title} class="w-full max-h-[600px] object-contain bg-neutral-100 dark:bg-neutral-800 mb-8" style="max-width:100%;height:auto;" loading="lazy" />
+            <div class="prose dark:prose-invert max-w-none text-base md:text-lg leading-7 md:leading-8 mt-10">
+              {blog.body && blog.body.map((block, idx) => {
+                if (block._type === 'block') {
+                  let element = null;
+                  switch (block.style) {
+                    case 'h1':
+                      element = <h1>{block.children?.map(child => child.text).join(' ')}</h1>; break;
+                    case 'h2':
+                      element = <h2>{block.children?.map(child => child.text).join(' ')}</h2>; break;
+                    case 'h3':
+                      element = <h3>{block.children?.map(child => child.text).join(' ')}</h3>; break;
+                    case 'blockquote':
+                      element = <blockquote>{block.children?.map(child => child.text).join(' ')}</blockquote>; break;
+                    default:
+                      element = <p class="mb-6 first:mt-0 mt-0">{block.children?.map(child => child.text).join(' ')}</p>;
+                  }
+                  // Add a blank line (margin) between paragraphs
+                  return <div key={idx} class="">{element}</div>;
+                }
+                return null;
+              })}
+            </div>
+          </div>
+        </article>
+      ) : (
+        <p>Blog post not found.</p>
+      )}
+    </main>
+    <Footer />
+  </body>
+</html>

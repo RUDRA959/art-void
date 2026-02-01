@@ -1,0 +1,54 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import BaseHead from "../components/BaseHead.astro";
+import { fetchBlogs, urlFor } from "../lib/sanity";
+
+let blogs = await fetchBlogs();
+blogs = blogs.sort((a, b) => {
+  if (a.year !== b.year) return b.year - a.year;
+  return b.month - a.month;
+});
+
+---
+<html lang="en">
+  <head>
+    <BaseHead title="Blog | Artist" description="Read the latest blog posts from the artist." />
+  </head>
+  <body class="w-full max-w-screen-md mx-auto my-4 dark:bg-neutral-800 dark:text-neutral-300 transition-colors duration-300">
+    <Header />
+    <main class="flex flex-col gap-8 px-4 md:px-0">
+      <section class="mb-8">
+        <h1 class="text-3xl font-bold mb-4">Blog</h1>
+        <ul class="grid gap-8 md:grid-cols-2">
+          {blogs.map(blog => (
+            <li
+              class="rounded-xl shadow-lg bg-white dark:bg-neutral-900 overflow-hidden flex flex-col transition-transform hover:-translate-y-1 hover:shadow-2xl border border-neutral-200 dark:border-neutral-800"
+              key={blog._id}
+            >
+              <a href={`/blog/${blog.slug}`} class="block w-full h-56 overflow-hidden">
+                <img
+                  src={urlFor(blog.image).url()}
+                  alt={blog.title}
+                  class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  loading="lazy"
+                />
+              </a>
+              <div class="flex-1 flex flex-col p-5">
+                <div class="flex items-center gap-3 mb-2">
+                  <a href={`/blog/${blog.slug}`} class="text-xl font-bold hover:underline line-clamp-2">{blog.title}</a>
+                  <span class="text-xs text-gray-500 dark:text-neutral-400 whitespace-nowrap">{blog.month}/{blog.year}</span>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-neutral-300 mb-4 line-clamp-3">
+                  {blog.body && blog.body.find(block => block._type === 'block' && block.style === 'normal')?.children?.map(child => child.text).join(' ')}
+                </p>
+                <a href={`/blog/${blog.slug}`} class="mt-auto px-4 py-2 rounded bg-neutral-100 dark:bg-neutral-800 text-base font-medium text-gray-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition self-start shadow-sm">Read more →</a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
