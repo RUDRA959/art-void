@@ -2,17 +2,14 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import BaseHead from "../components/BaseHead.astro";
-import { getCollection } from 'astro:content';
+
 import ArtGallery from '../components/ArtGallery.astro';
 import { fetchArtworks, urlFor } from '../lib/sanity';
 
 export const prerender = false;
 
-const artItems = await getCollection('art');
 const sanityArtworks = await fetchArtworks();
-
-// Merge Sanity artworks with existing artItems
-const transformedSanityArtworks = sanityArtworks.map((art: any) => ({
+const transformedArtworks = sanityArtworks.map((art: any) => ({
   data: {
     name: art.title,
     heroImage: art.image ? urlFor(art.image).url() : '',
@@ -24,9 +21,7 @@ const transformedSanityArtworks = sanityArtworks.map((art: any) => ({
   }
 }));
 
-const allArtworks = [...artItems, ...transformedSanityArtworks];
-
-const mediums = Array.from(new Set(allArtworks.map(a => a.data.medium).filter(Boolean)));
+const mediums = Array.from(new Set(transformedArtworks.map(a => a.data.medium).filter(Boolean)));
 mediums.unshift('All');
 
 const url = new URL(Astro.request.url, Astro.site);
@@ -36,10 +31,9 @@ function slugify(str: string): string {
   return str.toLowerCase().replace(/\s+/g, '-');
 }
 
-// Filter artworks by selected medium (case-insensitive comparison)
 const filteredArt = selectedMedium === 'All' 
-  ? allArtworks 
-  : allArtworks.filter(art => slugify(art.data.medium) === mediumParam);
+  ? transformedArtworks 
+  : transformedArtworks.filter(art => slugify(art.data.medium) === mediumParam);
 
 filteredArt.sort((a, b) => {
   if (a.data.year !== b.data.year) return b.data.year - a.data.year;
