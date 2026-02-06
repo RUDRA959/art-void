@@ -5,16 +5,12 @@ import {schemaTypes} from './schemaTypes'
 
 export default defineConfig({
   name: 'default',
-  title: 'portfolio',
+  title: 'backend',
 
-  projectId: 'e26mzpce',
+  projectId: '8mgee67b',
   dataset: 'production',
 
   plugins: [structureTool(), visionTool()],
-
-  studio: {
-    // name: 'artist-portfolio', // can be anything
-  },
 
   schema: {
     types: schemaTypes,
